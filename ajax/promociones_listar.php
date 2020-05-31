@@ -48,7 +48,7 @@ $numrows=mysqli_num_rows($query);
 							<p>Price : <strong><?php echo "<font color=red><b>$ ".number_format($prod_precio_oferta,2,',','.')."</b></font>"; ?></strong>  </p>
 							<p><a href="#">Optional dismiss button </a></p>
 							<p>Ptional dismiss button in tional dismiss button in   </p>
-							<p><a href="accionCarrito.php?action=addToCart&id=<?php echo $articulo_id; ?>" class="btn btn-success" role="button">Add To Cart</a> <a href="#" class="btn btn-primary" role="button">See Details</a></p>
+							<p><a href="accionCarrito.php?action=addToCart&id=<?php echo $articulo_id; ?>" class="btn btn-success" role="button"><i class="fa fa-shopping-cart fa-lg">&nbsp;</i>Agregar</a> <a href="#" class="btn btn-primary" role="button">Ver Detalle</a></p>
 						</div>
 					</div>
 				</div>
