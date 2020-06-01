@@ -63,6 +63,14 @@ color: #000;
 color: #FFF;
 }
 
+.navbar-nav > .active > a {
+  color: aqua;
+  background-color: chartreuse;
+}
+.nav-item > a:hover {
+  color: aqua;
+}
+
 .navbar-default .navbar-brand {
 color: #000000;
 }

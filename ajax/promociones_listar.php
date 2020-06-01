@@ -8,11 +8,28 @@ $sWhere=" ";
 $sWhere.=" order by promociones.descripcion";
 
 
-$sql="SELECT * FROM  $tables  $sWhere  LIMIT 0,3";
+include 'pagination.php'; //include pagination file
 
+//pagination variables
+$page = (isset($_REQUEST['page']) && !empty($_REQUEST['page']))?$_REQUEST['page']:1;
+$per_page = intval($_REQUEST['per_page']); //how much records you want to show
+$adjacents  = 4; //gap between pages after number of adjacents
+$offset = ($page - 1) * $per_page;
+
+//Count the total number of row in your table*/
+$count_query   = mysqli_query($con,"SELECT count(*) AS numrows FROM $tables  $sWhere ");
+if ($row= mysqli_fetch_array($count_query))
+{
+	$numrows = $row['numrows'];
+}
+else {echo mysqli_error($con);}
+$total_pages = ceil($numrows/$per_page);
+//$reload = './banner_ajax.php';
+//main query to fetch the data
+
+$sql="SELECT * FROM  $tables  $sWhere LIMIT $offset,$per_page";
+//die($sql."entroooo");
 $query = mysqli_query($con,$sql);
-
-$numrows=mysqli_num_rows($query);
 
 	//loop through fetched data
 	if ($numrows>0)	{
@@ -54,5 +71,16 @@ $numrows=mysqli_num_rows($query);
 				</div>
 				<?php
 			} // END WHILE
+			?>
+
+			<div class="row">
+				<?php echo paginate($page, $total_pages, $adjacents);?>
+			</div>
+
+			<div class="clearfix"></div>
+			<br><br>
+
+
+<?php
 	} // END IF
 ?>

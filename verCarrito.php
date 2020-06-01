@@ -1,12 +1,8 @@
 <?php
-include("config/conexion.php");
+// initializ shopping cart class
 include 'carrito.php';
 $cart = new Cart;
-$paginaActivo='ingresar';
-$targetUrl=!isset($_GET['target'])?NULL:$_GET['target'];
-if ($targetUrl=="") $targetUrl="index"
-
-
+$paginaActivo='verCarrito';
 
 ?>
 
@@ -131,53 +127,85 @@ if ($targetUrl=="") $targetUrl="index"
     </div>
     <!-- /.col -->
     <div class="col-md-9">
-
-
-
-      <!-- /.row ************************************************************************-->
-<div class="row" id="resultado">
-
-  <div class="row justify-content-md-center">
-    <div class="col">
-      <div class="modal-dialog">
-        <div class="modal-content">
-
-          <form name="formLogin" id="formLogin">
-
-            <div class="modal-header">
-              <h4 class="modal-title">Login</h4>
-            </div>
-
-            <div class="modal-body">
-              <div class="form-group">
-                <label>Email</label>
-                <input type="email" name="login" id="login" class="form-control" required>
-                <input type="hidden" id="textTargetUrl" class="fadeIn second" name="textTargetUrl" value="<?php echo $targetUrl;?>">
-              </div>
-              <div class="form-group">
-                <label>Contraseña</label>
-                <input type="password" name="password" id="password" class="form-control" required>
-              </div>
-            </div>
-
-            <div class="modal-footer">
-
-              <a href="registrarme.php">Registrame</a>&nbsp;&nbsp;&nbsp;
-              <input type="submit" class="btn btn-success" value="Aceptar">
-            </div>
-
-          </form>
-          &nbsp;<div id="resultado_login" class="text-center"></div>&nbsp;
-          <div class="outer_div"></div><!-- Datos ajax Final -->
-
-        </div>
+      <div>
+        <ol class="breadcrumb">
+          <li><a href="#">Home</a></li>
+          <li class="active">Electronics</li>
+        </ol>
       </div>
-    </div>
-  </div>
 
 
+      <!-- /.row -->
+<div class="row" id="resultado">
+<h4>Carrito de Compras</h4>
+<br>
+        <table class="table">
+          <thead>
+            <tr>
+              <th class="text-left">Producto</th>
+              <th class="text-center">Precio</th>
+              <th class="text-center">Cantidad</th>
+              <th class="text-center">Sub total</th>
+              <th>&nbsp;</th>
+            </tr>
+          </thead>
 
-</div> <!-- END RESULTADO  ************************************************************-->
+          <tbody>
+            <?php
+            //echo $cart->total_items();
+            if($cart->total_items() > 0){
+              //get cart items from session
+              $cartItems = $cart->contents();
+              //var_dump($cartItems);
+              foreach($cartItems as $item){
+                ?>
+                <tr>
+                  <td><?php echo $item["name"]; ?></td>
+                  <td><?php echo '$'.number_format($item["price"],2,'.',',').' '; ?></td>
+                  <td><input type="number" class="form-control text-center" value="<?php echo $item["qty"]; ?>"
+                    onchange="updateCartItem(this, '<?php echo $item["rowid"]; ?>')" style="padding-top: 0px;height: 28px;"
+                    ></td>
+                    <td class="text-right"><?php echo '$'.number_format($item["subtotal"],2,'.',',').' '; ?></td>
+                    <td style="width: 20px;">
+                      <p class="text-center" style="width: 20px;">
+                        <a href="accionCarrito.php?action=removeCartItem&id=<?php echo $item["rowid"]; ?>" onclick="return confirm('Confirma eliminar?')">
+                          <i class="fa fa-trash fa-lg" aria-hidden="true"></i>
+                        </a>
+                      </p>
+                    </td>
+                  </tr>
+                <?php } }else{ ?>
+                  <tr><td colspan="5"><p>Tu carrito esta vacio.....</p></td>
+                  <?php } ?>
+                </tbody>
+
+                <tfoot>
+
+
+                  <tr>
+                    <td></td>
+                    <td colspan="2"></td>
+                    <?php if($cart->total_items() > 0){ ?>
+                      <td class="text-center"><strong>Total <?php echo '$'.number_format($cart->total(),2,'.',',').' '; ?></strong></td>
+                      <td></td>
+                    <?php } ?>
+                  </tr>
+                  <tr>
+                    <td><a href="index.php" class="btn btn-warning"><i class="glyphicon glyphicon-menu-left"></i> Continue Comprando</a></td>
+                    <td></td>
+                    <td></td>
+                    <td colspan="2">
+
+
+                      <a href="<?php echo ($usuario=="")?"login.php?target=ordenPagos":"ordenPagos.php"; ?>" id="btnConfirmarPedido" class="btn btn-success orderBtn" >
+                        Confirmar Pedido<i class="glyphicon glyphicon-menu-right"></i>
+                      </a>
+                    </td>
+                  </tr>
+                </tfoot>
+              </table>
+
+            </div>
             <!-- /.row -->
           </div>
           <!-- /.col -->
@@ -303,39 +331,17 @@ if ($targetUrl=="") $targetUrl="index"
 
       <script>
 
-      $(document).ready(function() {
-
-       /*$.ajaxSetup({ cache: true });
-        $.getScript('https://connect.facebook.net/en_US/sdk.js', function(){
-          FB.init({
-            appId: '562700931186018',
-            version: 'v5.0' // or v2.1, v2.2, v2.3, ...
-          });
-          $('#loginbutton,#feedbutton').removeAttr('disabled');
-          //FB.getLoginStatus(updateStatusCallback);
-        });    */
-
-
-        $( "#formLogin" ).submit(function( event ) {
-          var parametros = $(this).serialize();
-          $.ajax({
-            type: "POST",
-            url: "ajax/autenticacion.php",
-            data: parametros,
-            beforeSend: function(objeto){
-              $("#resultado_login").html("<center><img src='img/ajax-loader.gif'></center>");
-            },
-            success: function(datos){
-              mensaje='<div class="alert alert-danger" role="alert"><button type="button" class="close" data-dismiss="alert">&times;</button>'+
-                      '<strong>Error!</strong> El Usuario/Password son Incorrectos.</div>';
-              if (datos=='no') $("#resultado_login").html(mensaje);
-              else $(location).attr('href',datos);
-            }
-          });
-          event.preventDefault();
+      function updateCartItem(obj,id){
+        console.log('qty: '+obj.value+' id: '+id);
+        $.get("accionCarrito.php", {action:"updateCartItem", id:id, qty:obj.value}, function(data){
+          //alert(data)
+          if(data == 'ok'){
+            location.reload();
+          }else{
+            alert('Cart update failed, please try again.');
+          }
         });
-      });
-
+      }
 
     </script>
 
